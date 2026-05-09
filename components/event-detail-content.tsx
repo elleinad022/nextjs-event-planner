@@ -7,6 +7,7 @@ import { Badge } from "./ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Form } from "./ui/form";
 import { createInviteLinkAction } from "@/lib/actions/events";
+import { deleteEventAction } from "@/lib/actions/events";
 import {
   Table,
   TableBody,
@@ -85,6 +86,8 @@ const EventDetailContent = async ({
   const inviteUrl = event.inviteToken
     ? `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/invite/${event.inviteToken}`
     : null;
+
+  const deleteEventActionForEvent = deleteEventAction.bind(null, eventId);
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap justify-between items-center gap-3">
@@ -105,9 +108,16 @@ const EventDetailContent = async ({
             </p>
           )}
         </div>
-        <Button asChild variant="outline">
-          <Link href={"/dashboard"}>Back</Link>
-        </Button>
+        <div className="flex flex-row gap-4">
+          <form action={deleteEventActionForEvent}>
+            <Button variant="destructive" type="submit">
+              Delete
+            </Button>
+          </form>
+          <Button asChild variant="outline">
+            <Link href={"/dashboard"}>Back</Link>
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2 text-xs">

@@ -72,9 +72,11 @@ const DashboardContent = async ({ userId }: { userId: string }) => {
               <CardHeader className="space-y-2">
                 <div className="flex justify-between items-center gap-2">
                   <CardTitle className="text-lg ">{event.title}</CardTitle>
-                  <Button size="sm" asChild>
-                    <Link href={`/events/${event.id}`}>Open</Link>
-                  </Button>
+                  <div className="space-x-2">
+                    <Button size="sm" asChild>
+                      <Link href={`/events/${event.id}`}>Open</Link>
+                    </Button>
+                  </div>
                 </div>
                 <div className="flex flex-wrap gap-1 text-xs">
                   <Badge>Going: {event.goingCount}</Badge>

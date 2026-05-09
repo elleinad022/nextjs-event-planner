@@ -6,6 +6,8 @@ import { prisma } from "../prisma";
 import { parse } from "path";
 import { FUNCTIONS_CONFIG_MANIFEST } from "next/dist/shared/lib/constants";
 import { RsvpStatus } from "../generated/prisma/enums";
+import { log } from "console";
+import { revalidatePath } from "next/cache";
 
 function parseCreateEvent(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
@@ -54,9 +56,9 @@ export const createEventAction = async (formData: FormData) => {
   }
 
   const input = parseCreateEvent(formData);
-
+  let created;
   try {
-    const created = await prisma.event.create({
+    created = await prisma.event.create({
       data: {
         ownerUserId: userId,
         title: input.title,
@@ -65,11 +67,35 @@ export const createEventAction = async (formData: FormData) => {
         eventDate: input.eventDate ? new Date(input.eventDate) : null,
       },
     });
-
-    redirect(`/events/${created.id}`); // Redirect to the event details page after creation
   } catch (err) {
     console.error(err);
+    return;
   }
+  redirect(`/events/${created.id}`); // Redirect to the event details page after creation
+};
+
+export const deleteEventAction = async (eventId: string) => {
+  //FEATURE TO BE ADDED!!
+  const session = await getSession();
+  const userId = session.data?.user.id;
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+
+  const owns = await prisma.event.findFirst({
+    where: { id: eventId, ownerUserId: userId },
+    select: { id: true },
+  });
+
+  if (!owns) {
+    throw new Error("Error not found.");
+  }
+
+  await prisma.event.delete({
+    where: { id: eventId },
+  });
+
+  redirect("/dashboard");
 };
 
 export const createInviteLinkAction = async (eventId: string) => {
@@ -94,6 +120,8 @@ export const createInviteLinkAction = async (eventId: string) => {
     create: { eventId, token },
     update: { token },
   });
+
+  revalidatePath(`/events/${eventId}`);
 };
 
 export const submitOrUpdateRsvpAction = async (
