@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import CopyButton from "./copy-link-button";
 
 const EventDetailContent = async ({
   userId,
@@ -134,8 +135,11 @@ const EventDetailContent = async ({
             account.
           </p>
           {inviteUrl ? (
-            <div className="rounded-md border border-(--border) bg-(--surface) p-3 text-sm">
-              {inviteUrl}
+            <div className="space-y-2">
+              <div className="truncate rounded-md border border-(--border) bg-(--surface) p-3 text-sm">
+                {inviteUrl}
+              </div>
+              <CopyButton text={inviteUrl} />
             </div>
           ) : (
             <p className="text-sm text-(--muted-foreground)">
